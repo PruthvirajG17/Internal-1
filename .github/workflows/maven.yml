@@ -39,10 +39,10 @@ jobs:
       - name: Check Docker Hub Credentials
         if: github.event_name == 'push'
         env:
-          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME_1 }}
+          DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN_1 }}
         run: |
-          if [ -z "$DOCKER_USERNAME" ]; then
+          if [ -z "$DOCKER_USERNAME_1" ]; then
             echo "Error: DOCKERHUB_USERNAME secret is missing"
             exit 1
           fi

@@ -1,5 +1,5 @@
 
-name: Maven Build and Test
+name: Maven Build and Docker Hub Push
 
 on:
   push:
@@ -8,13 +8,15 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout source code
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # Configure Java
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -22,11 +24,27 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build with Maven
-        run: mvn clean compile
+      # Build Maven project and run tests
+      - name: Build and Test
+        run: mvn clean verify
 
-      - name: Run JUnit Tests
-        run: mvn test
+      # Configure Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Package Application
-        run: mvn package
+      # Login to Docker Hub
+      - name: Login to Docker Hub
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Build and push Docker image
+      - name: Build and Push Docker Image
+        if: github.event_name == 'push'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/internal-1:latest

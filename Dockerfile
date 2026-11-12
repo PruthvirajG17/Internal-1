@@ -6,7 +6,7 @@ FROM maven:3.9.9-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
-# Copy Maven project files
+# Copy Maven project
 COPY pom.xml .
 
 # Download dependencies
@@ -15,7 +15,7 @@ RUN mvn dependency:go-offline
 # Copy source code
 COPY src ./src
 
-# Build the application
+# Build Maven application
 RUN mvn clean package -DskipTests
 
 
@@ -26,8 +26,8 @@ FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
-# Copy generated JAR from build stage
-COPY --from=build /app/target/Calculator-1.0-SNAPSHOT.jar app.jar
+# Copy generated JAR file
+COPY --from=build /app/target/Calculator-0.0.1-SNAPSHOT.jar app.jar
 
-# Run Java application
+# Run application
 ENTRYPOINT ["java", "-jar", "app.jar"]
